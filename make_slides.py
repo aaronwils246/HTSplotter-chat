@@ -1,14 +1,15 @@
 """
-Generate a 6-slide PowerPoint summary of the HTSplotter analysis.
+Generate a 7-slide PowerPoint summary of the HTSplotter analysis.
 Run: python make_slides.py
 Output: HTSplotter_Summary.pptx
 
 Slide 1 — Title & overview
 Slide 2 — The 4 experiment types
 Slide 3 — Drug screen results
-Slide 4 — Drug combination synergy
-Slide 5 — Genetic perturbagen screens
-Slide 6 — AI-assisted chat interface
+Slide 4 — Drug combination: MK-1775 + Prexasertib
+Slide 5 — Drug combination: MK-1775 + BAY1895344
+Slide 6 — Genetic perturbagen screens
+Slide 7 — AI-assisted chat interface
 """
 
 from pptx import Presentation
@@ -34,7 +35,8 @@ prs.slide_width  = Inches(13.33)
 prs.slide_height = Inches(7.5)
 blank = prs.slide_layouts[6]
 
-TOTAL = 6
+TOTAL = 7
+AI_PURPLE = RGBColor(0x5B, 0x2D, 0x8E)   # badge colour for AI interpretations
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 def bg(slide, color):
@@ -89,6 +91,12 @@ def bullet_block(slide, items, l, t, w, h, size=11, color=TEXT_DARK, marker="•
         r = p.add_run(); r.text = marker + item
         r.font.size = Pt(size); r.font.color.rgb = color
     return tb
+
+def ai_badge(slide, l, t, w=2.55, h=0.32):
+    """Small pill-shaped badge labelling a section as AI-assisted interpretation."""
+    box(slide, l, t, w, h, fill=AI_PURPLE)
+    txt(slide, "🤖  AI-Assisted Interpretation", l+0.08, t+0.04, w-0.12, h-0.06,
+        size=10, bold=True, color=WHITE)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -306,6 +314,7 @@ txt(s3, "★  Most Potent", 8.47, 1.44, 1.36, 0.38,
 box(s3, 0.3, 3.45, 8.1, 3.55,
     fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
 txt(s3, "Key Findings", 0.5, 3.52, 4.0, 0.35, size=14, bold=True, color=DARK_BLUE)
+ai_badge(s3, 5.6, 3.5)
 bullet_block(s3, [
     "Prexasertib is the most potent agent — IC₅₀ ≈ 10 nM, roughly 27× more potent than BAY1895344 and 66× more potent than MK-1775.",
     "Prexasertib's dose-response curve did not reach complete inhibition (plateaus at ~40–50%), suggesting a cytostatic rather than cytotoxic effect at the concentrations tested.",
@@ -332,72 +341,148 @@ footer(s3, 3)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SLIDE 4 — Drug Combination Synergy
+#  SLIDE 4 — Drug Combination: MK-1775 + Prexasertib
 # ══════════════════════════════════════════════════════════════════════════════
 s4 = prs.slides.add_slide(blank)
 bg(s4, WHITE)
-header(s4, "Drug Combination Synergy — Bliss Independence Model",
-       "MK-1775 combined with Prexasertib and BAY1895344  ·  MCF7 cells  ·  7×7 dose matrix  ·  72 h")
+header(s4, "Drug Combination: MK-1775 + Prexasertib — Bliss Independence Model",
+       "WEE1 inhibitor + CHK1/2 inhibitor  ·  MCF7 cells  ·  7×7 dose matrix  ·  72 h")
 
-# Context strip
-box(s4, 0.3, 1.0, 12.7, 0.55,
-    fill=RGBColor(0xEF, 0xF4, 0xFB), line=MID_BLUE, lw=1)
-txt(s4, "Bliss independence assumes the two drugs act independently. "
-        "A Bliss score > 0 means the combination is more effective than predicted (synergy); "
-        "< 0 means less effective (antagonism); ≈ 0 means additive.",
-    0.5, 1.06, 12.3, 0.42, size=11, color=DARK_BLUE)
+# Bliss explainer
+box(s4, 0.3, 1.0, 12.73, 0.5, fill=RGBColor(0xEF, 0xF4, 0xFB), line=MID_BLUE, lw=1)
+txt(s4, "Bliss score > 0 = synergy (combination exceeds predicted additive effect)  ·  "
+        "= 0 = additive  ·  < 0 = antagonism",
+    0.5, 1.08, 12.3, 0.34, size=11, color=DARK_BLUE)
 
-for label, badge, badge_fill, bg_fill, scores, interpretation, y0 in [
-    (
-        "MK-1775  +  Prexasertib",
-        "SYNERGISTIC", GREEN, RGBColor(0xE8, 0xF5, 0xE9),
-        [
-            "Max Bliss score: +0.56  (MK-1775 1,235 nM + Prexasertib 4.7 nM)",
-            "Strong synergy across mid-range MK-1775 (137–1,235 nM) combined with low-dose Prexasertib (1.4–7.1 nM)",
-            "Synergy diminishes at saturating MK-1775 concentrations (≥11,111 nM) — ceiling effect as single agent effect dominates",
-            "Pattern consistent across both 1-timepoint and multi-timepoint datasets",
-        ],
-        "These two checkpoint kinase inhibitors (WEE1 + CHK1/2) show clear synergy at "
-        "clinically relevant dose combinations, supporting their combined use in MCF7 cells.",
-        1.65,
-    ),
-    (
-        "MK-1775  +  BAY1895344",
-        "WEAK / ADDITIVE", ORANGE, RGBColor(0xFF, 0xF8, 0xF0),
-        [
-            "Max Bliss score: +0.42  (MK-1775 137 nM + BAY1895344 167 nM)",
-            "Majority of scores near zero — interaction is largely additive across the matrix",
-            "Occasional moderate synergy at specific dose pairs but no consistent pattern",
-            "Both 1-timepoint and multi-timepoint datasets show similar additive behaviour",
-        ],
-        "MK-1775 (WEE1i) and BAY1895344 (ATRi) do not demonstrate robust synergy in MCF7 cells "
-        "at the concentrations tested — the combination does not exceed additive expectations.",
-        4.4,
-    ),
+# Result banner
+box(s4, 0.3, 1.6, 12.73, 0.58, fill=GREEN)
+txt(s4, "Result:  SYNERGISTIC  —  Max Bliss score +0.56",
+    0.5, 1.67, 9.0, 0.42, size=18, bold=True, color=WHITE)
+txt(s4, "✅ COMPLETE", 11.0, 1.68, 1.85, 0.38,
+    size=13, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+
+# Main findings (left panel)
+box(s4, 0.3, 2.28, 7.8, 4.72, fill=RGBColor(0xE8, 0xF5, 0xE9), line=GREEN, lw=1)
+txt(s4, "Key Findings", 0.5, 2.36, 5.0, 0.38, size=15, bold=True, color=DARK_BLUE)
+bullet_block(s4, [
+    "Max Bliss score: +0.56  at MK-1775 1,235 nM + Prexasertib 4.7 nM",
+    "Strong synergy across mid-range MK-1775 (137–1,235 nM) combined with low-dose Prexasertib (1.4–7.1 nM)",
+    "Synergy diminishes at saturating MK-1775 doses (≥11,111 nM) — ceiling effect as single-agent dominates",
+    "Pattern consistent across 1-timepoint and multi-timepoint (37 TP) datasets",
+    "MK-1775 IC₅₀ = 657 nM  |  Prexasertib IC₅₀ = 10 nM as single agents",
+    "Combination achieves greater inhibition at sub-IC₅₀ doses of both drugs",
+], 0.5, 2.82, 7.3, 3.8, size=12)
+
+# Bliss score scale graphic
+txt(s4, "Bliss Score Distribution", 0.5, 6.0, 4.0, 0.3,
+    size=11, bold=True, color=DARK_BLUE)
+for val, lft, w, col, label in [
+    (-0.05, 0.5,  1.4, RGBColor(0xFF,0xCC,0x99), "Antagonism\n< 0"),
+    ( 0.0,  1.9,  1.4, LIGHT_GREY,                "Additive\n≈ 0"),
+    (+0.56, 3.3,  4.3, RGBColor(0xC8,0xE6,0xC9), "Synergy\n0 → +0.56"),
 ]:
-    box(s4, 0.3, y0, 12.7, 2.55, fill=bg_fill, line=badge_fill, lw=1.5)
-    box(s4, 0.3, y0, 12.7, 0.48, fill=badge_fill)
-    txt(s4, label, 0.5, y0+0.07, 8.0, 0.35, size=15, bold=True, color=WHITE)
-    box(s4, 9.7, y0+0.07, 3.1, 0.35, fill=WHITE)
-    txt(s4, badge, 9.72, y0+0.08, 3.06, 0.3,
-        size=12, bold=True, color=badge_fill, align=PP_ALIGN.CENTER)
+    box(s4, lft, 6.35, w, 0.55, fill=col, line=RGBColor(0xAA,0xAA,0xAA), lw=0.5)
+txt(s4, "Antagonism  < 0", 0.55, 6.38, 1.3, 0.48, size=9, color=ORANGE)
+txt(s4, "Additive  ≈ 0",   1.95, 6.38, 1.3, 0.48, size=9, color=TEXT_DARK)
+txt(s4, "Synergy  0 → +0.56  ★ peak observed",
+    3.35, 6.38, 4.2, 0.48, size=9, bold=True, color=GREEN)
 
-    # Bullet points (left)
-    bullet_block(s4, scores, 0.45, y0+0.57, 7.5, 1.85, size=11)
-
-    # Interpretation (right)
-    box(s4, 8.1, y0+0.55, 4.75, 1.88,
-        fill=WHITE, line=badge_fill, lw=0.8)
-    txt(s4, "Interpretation", 8.25, y0+0.6, 4.4, 0.28,
-        size=10, bold=True, color=badge_fill)
-    txt(s4, interpretation, 8.25, y0+0.92, 4.45, 1.4,
-        size=10, color=TEXT_DARK, italic=True)
+# AI interpretation panel (right)
+box(s4, 8.4, 2.28, 4.63, 4.72, fill=RGBColor(0xF3,0xEE,0xFA), line=AI_PURPLE, lw=1.5)
+ai_badge(s4, 8.55, 2.36)
+txt(s4, "Interpretation", 8.55, 2.75, 4.3, 0.35,
+    size=13, bold=True, color=AI_PURPLE)
+txt(s4,
+    "MK-1775 (WEE1 inhibitor) and Prexasertib (CHK1/2 inhibitor) "
+    "target complementary DNA damage checkpoint kinases. Blocking both "
+    "simultaneously prevents cells from pausing replication at two independent "
+    "checkpoints, forcing them into mitosis with unrepaired DNA — a mechanism "
+    "consistent with the observed synergy.\n\n"
+    "The synergy is strongest at mid-range MK-1775 doses where the WEE1 checkpoint "
+    "is partially inhibited and Prexasertib can tip cells into catastrophic "
+    "mitotic entry. At saturating MK-1775 doses, the WEE1 checkpoint is already "
+    "fully ablated, so adding Prexasertib provides little additional benefit.\n\n"
+    "These findings support the clinical rationale for combining WEE1 and CHK1/2 "
+    "inhibitors in MCF7 breast cancer cells.",
+    8.55, 3.18, 4.3, 3.65, size=10.5, color=TEXT_DARK, italic=False)
 
 footer(s4, 4)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SLIDE 5 — Genetic Perturbagen Screens
+#  SLIDE 5 — Drug Combination: MK-1775 + BAY1895344
+# ══════════════════════════════════════════════════════════════════════════════
+s5a = prs.slides.add_slide(blank)
+bg(s5a, WHITE)
+header(s5a, "Drug Combination: MK-1775 + BAY1895344 — Bliss Independence Model",
+       "WEE1 inhibitor + ATR inhibitor  ·  MCF7 cells  ·  7×7 dose matrix  ·  72 h")
+
+# Bliss explainer
+box(s5a, 0.3, 1.0, 12.73, 0.5, fill=RGBColor(0xEF, 0xF4, 0xFB), line=MID_BLUE, lw=1)
+txt(s5a, "Bliss score > 0 = synergy (combination exceeds predicted additive effect)  ·  "
+         "= 0 = additive  ·  < 0 = antagonism",
+    0.5, 1.08, 12.3, 0.34, size=11, color=DARK_BLUE)
+
+# Result banner
+box(s5a, 0.3, 1.6, 12.73, 0.58, fill=ORANGE)
+txt(s5a, "Result:  WEAK / ADDITIVE  —  Max Bliss score +0.42",
+    0.5, 1.67, 9.0, 0.42, size=18, bold=True, color=WHITE)
+txt(s5a, "✅ COMPLETE", 11.0, 1.68, 1.85, 0.38,
+    size=13, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+
+# Main findings (left panel)
+box(s5a, 0.3, 2.28, 7.8, 4.72, fill=RGBColor(0xFF,0xF8,0xF0), line=ORANGE, lw=1)
+txt(s5a, "Key Findings", 0.5, 2.36, 5.0, 0.38, size=15, bold=True, color=DARK_BLUE)
+bullet_block(s5a, [
+    "Max Bliss score: +0.42  at MK-1775 137 nM + BAY1895344 167 nM",
+    "Majority of scores near zero — interaction is largely additive across the 7×7 matrix",
+    "Occasional moderate synergy at specific dose pairs but no consistent pattern",
+    "Both 1-timepoint and multi-timepoint (37 TP) datasets show similar additive behaviour",
+    "MK-1775 IC₅₀ = 657 nM  |  BAY1895344 IC₅₀ = 273 nM as single agents",
+    "No dose region shows sustained, reproducible synergy above +0.3",
+], 0.5, 2.82, 7.3, 3.8, size=12)
+
+# Bliss score scale graphic
+txt(s5a, "Bliss Score Distribution", 0.5, 6.0, 4.0, 0.3,
+    size=11, bold=True, color=DARK_BLUE)
+for lft, w, col, label in [
+    (0.5, 1.4,  RGBColor(0xFF,0xCC,0x99), "Antagonism"),
+    (1.9, 3.5,  LIGHT_GREY,                "Mostly additive ≈ 0"),
+    (5.4, 1.95, RGBColor(0xC8,0xE6,0xC9), "Weak synergy"),
+]:
+    box(s5a, lft, 6.35, w, 0.55, fill=col, line=RGBColor(0xAA,0xAA,0xAA), lw=0.5)
+txt(s5a, "Antagonism < 0",       0.55, 6.38, 1.3, 0.48, size=9, color=ORANGE)
+txt(s5a, "Mostly additive  (bulk of scores)",
+    1.95, 6.38, 3.4, 0.48, size=9, color=TEXT_DARK)
+txt(s5a, "Weak synergy  → +0.42",
+    5.45, 6.38, 1.85, 0.48, size=9, bold=True, color=GREEN)
+
+# AI interpretation panel (right)
+box(s5a, 8.4, 2.28, 4.63, 4.72, fill=RGBColor(0xF3,0xEE,0xFA), line=AI_PURPLE, lw=1.5)
+ai_badge(s5a, 8.55, 2.36)
+txt(s5a, "Interpretation", 8.55, 2.75, 4.3, 0.35,
+    size=13, bold=True, color=AI_PURPLE)
+txt(s5a,
+    "MK-1775 (WEE1i) and BAY1895344 (ATRi) both target the replication stress "
+    "response, but through overlapping rather than complementary mechanisms. "
+    "WEE1 and ATR both regulate CDK1/2 activity and S-phase checkpoint "
+    "signalling — inhibiting both may not provide substantially more replication "
+    "fork collapse than either agent alone.\n\n"
+    "The largely additive Bliss scores suggest the two drugs are not cooperating "
+    "beyond their individual effects in MCF7 cells under these conditions. The "
+    "isolated peak at +0.42 (MK-1775 137 nM + BAY1895344 167 nM) is near the "
+    "IC₅₀ of both agents and could reflect a narrow window of partial checkpoint "
+    "co-inhibition rather than true biological synergy.\n\n"
+    "Contrast with MK-1775 + Prexasertib (Slide 4), where broader synergy "
+    "was observed — suggesting CHK1/2 inhibition is a more effective partner "
+    "for WEE1 inhibition than ATR inhibition in this model.",
+    8.55, 3.18, 4.3, 3.65, size=10.5, color=TEXT_DARK, italic=False)
+
+footer(s5a, 5)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SLIDE 6 — Genetic Perturbagen Screens
 # ══════════════════════════════════════════════════════════════════════════════
 s5 = prs.slides.add_slide(blank)
 bg(s5, WHITE)
@@ -473,18 +558,18 @@ bullet_block(s5, [
     "Time-resolved data reveals whether effects are immediate, delayed, or transient",
 ], 0.5, y1+0.98, 8.5, 1.78, size=11)
 
-box(s5, 9.2, y1+0.95, 3.65, 1.82, fill=WHITE, line=MID_BLUE, lw=0.8)
-txt(s5, "Interpretation", 9.35, y1+1.0, 3.4, 0.28, size=10, bold=True, color=MID_BLUE)
+box(s5, 9.2, y1+0.95, 3.65, 1.82, fill=RGBColor(0xF3,0xEE,0xFA), line=AI_PURPLE, lw=1.2)
+ai_badge(s5, 9.3, y1+1.0, w=2.45, h=0.28)
 txt(s5, "Time-course data provides richer biological insight than endpoint alone — "
         "a perturbagen with a delayed growth rate change may reflect an indirect "
         "or adaptive cellular response.",
-    9.35, y1+1.32, 3.4, 1.38, size=10, italic=True, color=TEXT_DARK)
+    9.3, y1+1.35, 3.45, 1.3, size=10, italic=True, color=TEXT_DARK)
 
-footer(s5, 5)
+footer(s5, 6)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SLIDE 6 — AI-Assisted Chat Interface
+#  SLIDE 7 — AI-Assisted Chat Interface
 # ══════════════════════════════════════════════════════════════════════════════
 s6 = prs.slides.add_slide(blank)
 bg(s6, WHITE)
@@ -566,10 +651,11 @@ feats = [
 txt(s6, "  ·  ".join(feats), 0.4, 6.9, 12.5, 0.18,
     size=9, bold=True, color=LIGHT_BLUE)
 
-footer(s6, 6)
+footer(s6, 7)
 
 
 # ── Save ───────────────────────────────────────────────────────────────────
-out = "/Users/aaronwilson/HTSplotter/HTSplotter_Summary.pptx"
+import os as _os
+out = _os.path.expanduser("~/HTSplotter/HTSplotter_Summary.pptx")
 prs.save(out)
 print(f"Saved: {out}")
