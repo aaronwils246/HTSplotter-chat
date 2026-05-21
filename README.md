@@ -4,11 +4,13 @@ Run [HTSplotter](https://github.com/CBIGR/HTSplotter) drug screen analyses and a
 
 ## What's included
 
-| Script | Description |
+| File | Description |
 |---|---|
 | `run_drugscreen.py` | Run a single-drug dose-response analysis |
 | `run_drugcombination.py` | Run a drug combination synergy analysis |
-| `chat_results.py` | Chat with Claude about your results |
+| `run_all_examples.py` | Run all 8 example datasets across all experiment types |
+| `chat_results.py` | Command-line chat interface (requires Python + API key) |
+| `htsplotter_ai.html` | **Browser-based AI assistant — no Python required** |
 
 ## Setup
 
@@ -38,9 +40,17 @@ python run_drugcombination.py
 
 Results are saved to `my_results/`.
 
-## Chatting about your results
+## Option A — Browser chat (easiest, no Python needed)
 
-Get an API key at [console.anthropic.com](https://console.anthropic.com), then:
+1. Get an API key at [console.anthropic.com](https://console.anthropic.com)
+2. Open `htsplotter_ai.html` in any modern browser (Chrome, Firefox, Safari, Edge)
+3. Paste your API key into the top-right field (saved automatically for next time)
+4. Drag and drop your HTSplotter `.txt` result files into the left panel
+5. Ask questions in plain English
+
+Your data never leaves your browser — only the file contents and your question are sent to Claude.
+
+## Option B — Command-line chat (Python)
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
@@ -53,7 +63,7 @@ By default it reads the drug screen results. To point it at any other results fo
 python chat_results.py path/to/output_results/
 ```
 
-**Example questions:**
+**Example questions (both interfaces):**
 - *Which drug was most potent?*
 - *What does the IC50 for Prexasertib tell me?*
 - *Is there synergy between MK-1775 and BAY1895344?*
