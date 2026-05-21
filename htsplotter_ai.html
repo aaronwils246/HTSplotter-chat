@@ -396,6 +396,32 @@
     }
     .clear-btn:hover { color: var(--error); }
 
+    /* Citation block */
+    .citation-block {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+      background: var(--bg);
+    }
+    .citation-text {
+      font-size: 0.69rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .citation-text a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .citation-text a:hover { text-decoration: underline; }
+    .citation-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
     /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -452,6 +478,27 @@
         <button class="sug-btn" onclick="useSuggestion(this)">Which genetic perturbagen had the strongest inhibitory effect?</button>
         <button class="sug-btn" onclick="useSuggestion(this)">How do I interpret the Bliss synergy scores?</button>
         <button class="sug-btn" onclick="useSuggestion(this)">Compare potency across all compounds tested</button>
+      </div>
+    </div>
+
+    <!-- Citation -->
+    <div class="citation-block">
+      <div class="citation-label">HTSplotter Citation</div>
+      <div class="citation-text">
+        Nunes C, Anckaert J, De Vloed F, De Wyn J, Durinck K,
+        Vandesompele J, Speleman F, Vermeirssen V.<br>
+        <em>HTSplotter: An end-to-end data processing, analysis and
+        visualisation tool for chemical and genetic in vitro perturbation
+        screening.</em><br>
+        <strong>PLoS One.</strong> 2024 Jan 5;19(1):e0296322.<br>
+        <a href="https://doi.org/10.1371/journal.pone.0296322"
+           target="_blank" rel="noopener">DOI: 10.1371/journal.pone.0296322</a>
+        &nbsp;·&nbsp; PMID: 38181013<br>
+        <a href="https://github.com/CBIGR/HTSplotter"
+           target="_blank" rel="noopener">github.com/CBIGR/HTSplotter</a>
+        &nbsp;·&nbsp;
+        <a href="https://htsplotter.cmgg.be"
+           target="_blank" rel="noopener">htsplotter.cmgg.be</a>
       </div>
     </div>
 
