@@ -1,0 +1,8 @@
+venv/
+repo/
+my_results/
+__pycache__/
+*.pyc
+*.hdf5
+*.pdf
+.DS_Store
