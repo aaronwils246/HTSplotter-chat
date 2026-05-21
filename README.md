@@ -78,5 +78,10 @@ Ghent University.
 
 This repository adds an AI chat interface on top of HTSplotter using the
 [Anthropic Claude API](https://console.anthropic.com). It does not modify the
-HTSplotter source code. Please cite the original HTSplotter authors if you use
-this tool in your research.
+HTSplotter source code. Please cite the original HTSplotter paper if you use
+this tool in your research:
+
+> Nunes C, Anckaert J, De Vloed F, De Wyn J, Durinck K, Vandesompele J, Speleman F, Vermeirssen V.
+> **HTSplotter: An end-to-end data processing, analysis and visualisation tool for chemical and genetic in vitro perturbation screening.**
+> *PLoS One.* 2024 Jan 5;19(1):e0296322.
+> DOI: [10.1371/journal.pone.0296322](https://doi.org/10.1371/journal.pone.0296322) | PMID: 38181013
