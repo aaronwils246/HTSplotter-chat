@@ -65,3 +65,18 @@ Edit `run_drugcombination.py` and set `synergy_method` to:
 - `0` — Bliss independence (default)
 - `1` — HSA
 - `2` — ZIP
+
+## Credits
+
+HTSplotter was created by **Carolina de Carvalho Nunes** and collaborators at the
+[Center for Biomarkers in Gastroenterology and Inflammatory Diseases (CBIGR)](https://github.com/CBIGR),
+Ghent University.
+
+- GitHub: https://github.com/CBIGR/HTSplotter
+- Web tool: https://htsplotter.cmgg.be/
+- License: [GPL v3](https://github.com/CBIGR/HTSplotter/blob/main/LICENSE.txt)
+
+This repository adds an AI chat interface on top of HTSplotter using the
+[Anthropic Claude API](https://console.anthropic.com). It does not modify the
+HTSplotter source code. Please cite the original HTSplotter authors if you use
+this tool in your research.
