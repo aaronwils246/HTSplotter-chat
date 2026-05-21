@@ -404,57 +404,81 @@ bg(s5, WHITE)
 header(s5, "Genetic Perturbagen Screen Results",
        "siRNA/shRNA knockdown screens  ·  MCF7 cells  ·  1 and multi-timepoint datasets")
 
-for sub_title, sub_detail, bullets, interpretation, y0 in [
-    (
-        "1 Time Point  |  1 Control  (48 h endpoint)",
-        "Gene perturbagens tested at 40 ng/well in MCF7 cells (12K/well seeding density)",
-        [
-            "Multiple siRNA/shRNA constructs screened in a single endpoint confluency assay",
-            "Normalised confluency (%) reported per perturbagen relative to non-targeting control (set to 100%)",
-            "Values above 100% indicate enhanced growth; below 100% indicate growth inhibition",
-            "Single-timepoint readout — captures cumulative effect but not kinetics",
-            "Identifies candidate genes whose knockdown significantly alters cell proliferation",
-        ],
-        "A straightforward binary screen: each perturbagen either hits or misses a growth phenotype. "
-        "Genes showing strong deviation from 100% are prioritised for follow-up validation.",
-        1.08,
-    ),
-    (
-        "Several Time Points  |  Multiple Controls  (23 time points, 3 h intervals, ~69 h total)",
-        "Same perturbagens measured across time, enabling growth kinetics and rate calculations",
-        [
-            "Growth rate computed at each time point as a ratio to the matched control group",
-            "Growth rate > 1.0 — cells proliferating faster than control (possible tumour suppressor knockdown)",
-            "Growth rate < 1.0 — cells proliferating slower than control (growth-promoting gene silenced)",
-            "Multiple independent control groups enable robust plate-wide normalisation",
-            "Time-resolved data reveals whether effects are immediate, delayed, or transient",
-        ],
-        "Time-course data provides richer biological insight than endpoint alone — a perturbagen "
-        "with a delayed growth rate change may reflect an indirect or adaptive cellular response.",
-        4.2,
-    ),
-]:
-    box(s5, 0.3, y0, 12.73, 2.88, fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
-    box(s5, 0.3, y0, 12.73, 0.52, fill=MID_BLUE)
-    txt(s5, sub_title, 0.5, y0+0.08, 9.5, 0.36, size=14, bold=True, color=WHITE)
-    box(s5, 10.5, y0+0.1, 2.35, 0.32, fill=TEAL)
-    txt(s5, "✅  COMPLETE", 10.52, y0+0.11, 2.31, 0.28,
-        size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+# ── Dataset 1: 1 time point ──────────────────────────────────────────────────
+y0 = 1.08
+box(s5, 0.3, y0, 12.73, 2.88, fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
+box(s5, 0.3, y0, 12.73, 0.52, fill=MID_BLUE)
+txt(s5, "1 Time Point  |  1 Control  (48 h endpoint)  —  75 perturbagens screened",
+    0.5, y0+0.08, 9.5, 0.36, size=14, bold=True, color=WHITE)
+box(s5, 10.5, y0+0.1, 2.35, 0.32, fill=TEAL)
+txt(s5, "✅  COMPLETE", 10.52, y0+0.11, 2.31, 0.28,
+    size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+txt(s5, "Gene perturbagens tested at 40 ng/well in MCF7 cells (12K/well). "
+        "Normalised confluency relative to non-targeting control (100%). "
+        "Note: gene names are anonymized in the HTSplotter public example dataset.",
+    0.5, y0+0.6, 12.3, 0.32, size=11, italic=True, color=DARK_BLUE)
 
-    txt(s5, sub_detail, 0.5, y0+0.6, 12.4, 0.32, size=11, italic=True, color=DARK_BLUE)
+bullet_block(s5, [
+    "75 perturbagens screened in a single endpoint confluency assay",
+    "Values above 100% = enhanced growth; below 100% = growth inhibition",
+    "Identifies candidate genes whose knockdown significantly alters cell proliferation",
+], 0.5, y0+0.98, 5.5, 1.78, size=11)
 
-    bullet_block(s5, bullets, 0.5, y0+0.98, 8.5, 1.75, size=11)
+# Notable hits table (right side of block)
+txt(s5, "Notable Hits  (48 h confluency vs. control)", 6.2, y0+0.98, 6.55, 0.28,
+    size=11, bold=True, color=DARK_BLUE)
 
-    box(s5, 9.2, y0+0.95, 3.65, 1.82,
-        fill=WHITE, line=MID_BLUE, lw=0.8)
-    txt(s5, "Interpretation", 9.35, y0+1.0, 3.4, 0.28,
-        size=10, bold=True, color=MID_BLUE)
-    txt(s5, interpretation, 9.35, y0+1.32, 3.4, 1.38,
-        size=10, italic=True, color=TEXT_DARK)
+hit_hdrs = ["Target", "Confluency %", "Effect"]
+hit_cw   = [1.6, 1.7, 2.85]
+hit_cx   = [6.2, 7.82, 9.54]
+for hd, cx, cw in zip(hit_hdrs, hit_cx, hit_cw):
+    box(s5, cx, y0+1.3, cw, 0.3, fill=DARK_BLUE)
+    txt(s5, hd, cx+0.05, y0+1.33, cw-0.08, 0.24,
+        size=10, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
 
-# Genetic-chemical note at bottom
-box(s5, 0.3, 7.08, 12.73, 0.0)   # spacer
-box(s5, 0.3, 7.08, 7.0, 0.0)
+hit_rows = [
+    ("GeneBK",  "65.2%",  "↓ Growth inhibition",  RGBColor(0xE2,0xEF,0xDA), GREEN),
+    ("GeneBI",  "79.1%",  "↓ Growth inhibition",  WHITE,                    GREEN),
+    ("GeneAG",  "79.9%",  "↓ Growth inhibition",  RGBColor(0xE2,0xEF,0xDA), GREEN),
+    ("GeneAC", "126.1%",  "↑ Enhanced growth",    RGBColor(0xFF,0xF3,0xE8), ORANGE),
+    ("GeneX",  "124.5%",  "↑ Enhanced growth",    WHITE,                    ORANGE),
+    ("GeneE",  "124.0%",  "↑ Enhanced growth",    RGBColor(0xFF,0xF3,0xE8), ORANGE),
+]
+for ri, (gene, pct, effect, rf, ec) in enumerate(hit_rows):
+    ry = y0 + 1.6 + ri * 0.34
+    for val, cx, cw in zip([gene, pct, effect], hit_cx, hit_cw):
+        box(s5, cx, ry, cw, 0.32, fill=rf, line=RGBColor(0xCC,0xCC,0xCC), lw=0.4)
+        col = ec if val in [gene, pct] else TEXT_DARK
+        txt(s5, val, cx+0.05, ry+0.05, cw-0.08, 0.24,
+            size=10, bold=(val == gene), color=col,
+            align=PP_ALIGN.CENTER if val == pct else PP_ALIGN.LEFT)
+
+# ── Dataset 2: several time points ───────────────────────────────────────────
+y1 = 4.12
+box(s5, 0.3, y1, 12.73, 2.88, fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
+box(s5, 0.3, y1, 12.73, 0.52, fill=MID_BLUE)
+txt(s5, "Several Time Points  |  Multiple Controls  (23 time points, 3 h intervals, ~69 h total)",
+    0.5, y1+0.08, 9.5, 0.36, size=14, bold=True, color=WHITE)
+box(s5, 10.5, y1+0.1, 2.35, 0.32, fill=TEAL)
+txt(s5, "✅  COMPLETE", 10.52, y1+0.11, 2.31, 0.28,
+    size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+txt(s5, "Same perturbagens measured across time, enabling growth kinetics and rate calculations per target.",
+    0.5, y1+0.6, 12.3, 0.32, size=11, italic=True, color=DARK_BLUE)
+
+bullet_block(s5, [
+    "Growth rate computed at each time point as a ratio to matched control",
+    "Growth rate > 1.0 — cells proliferating faster (possible tumour suppressor knockdown)",
+    "Growth rate < 1.0 — cells proliferating slower (growth-promoting gene silenced)",
+    "Multiple independent control groups enable robust plate-wide normalisation",
+    "Time-resolved data reveals whether effects are immediate, delayed, or transient",
+], 0.5, y1+0.98, 8.5, 1.78, size=11)
+
+box(s5, 9.2, y1+0.95, 3.65, 1.82, fill=WHITE, line=MID_BLUE, lw=0.8)
+txt(s5, "Interpretation", 9.35, y1+1.0, 3.4, 0.28, size=10, bold=True, color=MID_BLUE)
+txt(s5, "Time-course data provides richer biological insight than endpoint alone — "
+        "a perturbagen with a delayed growth rate change may reflect an indirect "
+        "or adaptive cellular response.",
+    9.35, y1+1.32, 3.4, 1.38, size=10, italic=True, color=TEXT_DARK)
 
 footer(s5, 5)
 
