@@ -1,5 +1,5 @@
 """
-Generate a 5-slide PowerPoint summary of the HTSplotter analysis.
+Generate a 6-slide PowerPoint summary of the HTSplotter analysis.
 Run: python make_slides.py
 Output: HTSplotter_Summary.pptx
 
@@ -7,7 +7,8 @@ Slide 1 — Title & overview
 Slide 2 — The 4 experiment types
 Slide 3 — Drug screen results
 Slide 4 — Drug combination synergy
-Slide 5 — Genetic perturbagen screens + AI chat
+Slide 5 — Genetic perturbagen screens
+Slide 6 — AI-assisted chat interface
 """
 
 from pptx import Presentation
@@ -33,7 +34,7 @@ prs.slide_width  = Inches(13.33)
 prs.slide_height = Inches(7.5)
 blank = prs.slide_layouts[6]
 
-TOTAL = 5
+TOTAL = 6
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 def bg(slide, color):
@@ -396,100 +397,152 @@ footer(s4, 4)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SLIDE 5 — Genetic Screens & AI Chat
+#  SLIDE 5 — Genetic Perturbagen Screens
 # ══════════════════════════════════════════════════════════════════════════════
 s5 = prs.slides.add_slide(blank)
 bg(s5, WHITE)
-header(s5, "Genetic Perturbagen Screens & AI-Assisted Interpretation",
+header(s5, "Genetic Perturbagen Screen Results",
        "siRNA/shRNA knockdown screens  ·  MCF7 cells  ·  1 and multi-timepoint datasets")
 
-# ── LEFT: genetic results ────────────────────────────────────────────────────
-box(s5, 0.3, 1.0, 6.1, 6.05,
-    fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
-txt(s5, "Genetic Perturbagen Screen Results",
-    0.5, 1.07, 5.7, 0.38, size=14, bold=True, color=DARK_BLUE)
-
-for sub_title, status_col, bullets, y0 in [
+for sub_title, sub_detail, bullets, interpretation, y0 in [
     (
-        "1 Time Point  |  1 Control  (48 h)",
-        TEAL,
+        "1 Time Point  |  1 Control  (48 h endpoint)",
+        "Gene perturbagens tested at 40 ng/well in MCF7 cells (12K/well seeding density)",
         [
-            "Multiple gene perturbagens tested at 40 ng/well",
-            "Normalised confluency reported relative to non-targeting control",
-            "Identifies knockdowns that inhibit or enhance cell growth",
-            "Binary readout — no dose-response fitting applied",
+            "Multiple siRNA/shRNA constructs screened in a single endpoint confluency assay",
+            "Normalised confluency (%) reported per perturbagen relative to non-targeting control (set to 100%)",
+            "Values above 100% indicate enhanced growth; below 100% indicate growth inhibition",
+            "Single-timepoint readout — captures cumulative effect but not kinetics",
+            "Identifies candidate genes whose knockdown significantly alters cell proliferation",
         ],
-        1.52,
+        "A straightforward binary screen: each perturbagen either hits or misses a growth phenotype. "
+        "Genes showing strong deviation from 100% are prioritised for follow-up validation.",
+        1.08,
     ),
     (
-        "Several Time Points  |  Multiple Controls  (23 TP, 3 h interval)",
-        TEAL,
+        "Several Time Points  |  Multiple Controls  (23 time points, 3 h intervals, ~69 h total)",
+        "Same perturbagens measured across time, enabling growth kinetics and rate calculations",
         [
-            "Growth rate computed at every time point for each perturbagen",
-            "Growth rate ratio > 1.0 = faster than control (possible growth suppressor released)",
-            "Growth rate ratio < 1.0 = slower than control (growth inhibition)",
-            "Multiple control groups allow robust normalisation across the plate",
+            "Growth rate computed at each time point as a ratio to the matched control group",
+            "Growth rate > 1.0 — cells proliferating faster than control (possible tumour suppressor knockdown)",
+            "Growth rate < 1.0 — cells proliferating slower than control (growth-promoting gene silenced)",
+            "Multiple independent control groups enable robust plate-wide normalisation",
+            "Time-resolved data reveals whether effects are immediate, delayed, or transient",
         ],
-        3.5,
+        "Time-course data provides richer biological insight than endpoint alone — a perturbagen "
+        "with a delayed growth rate change may reflect an indirect or adaptive cellular response.",
+        4.2,
     ),
 ]:
-    box(s5, 0.45, y0, 5.75, 1.82,
+    box(s5, 0.3, y0, 12.73, 2.88, fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
+    box(s5, 0.3, y0, 12.73, 0.52, fill=MID_BLUE)
+    txt(s5, sub_title, 0.5, y0+0.08, 9.5, 0.36, size=14, bold=True, color=WHITE)
+    box(s5, 10.5, y0+0.1, 2.35, 0.32, fill=TEAL)
+    txt(s5, "✅  COMPLETE", 10.52, y0+0.11, 2.31, 0.28,
+        size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+
+    txt(s5, sub_detail, 0.5, y0+0.6, 12.4, 0.32, size=11, italic=True, color=DARK_BLUE)
+
+    bullet_block(s5, bullets, 0.5, y0+0.98, 8.5, 1.75, size=11)
+
+    box(s5, 9.2, y0+0.95, 3.65, 1.82,
         fill=WHITE, line=MID_BLUE, lw=0.8)
-    box(s5, 0.45, y0, 5.75, 0.38, fill=MID_BLUE)
-    txt(s5, sub_title, 0.6, y0+0.05, 4.3, 0.3,
-        size=12, bold=True, color=WHITE)
-    box(s5, 4.55, y0+0.05, 1.5, 0.28, fill=status_col)
-    txt(s5, "✅  COMPLETE", 4.57, y0+0.06, 1.46, 0.24,
-        size=9, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
-    bullet_block(s5, bullets, 0.6, y0+0.45, 5.45, 1.3, size=10)
+    txt(s5, "Interpretation", 9.35, y0+1.0, 3.4, 0.28,
+        size=10, bold=True, color=MID_BLUE)
+    txt(s5, interpretation, 9.35, y0+1.32, 3.4, 1.38,
+        size=10, italic=True, color=TEXT_DARK)
 
-# Genetic-chemical note
-box(s5, 0.45, 5.38, 5.75, 1.42,
-    fill=RGBColor(0xFF, 0xF8, 0xE1), line=ORANGE, lw=1)
-txt(s5, "⚠  Genetic-Chemical Perturbagen",
-    0.6, 5.44, 5.4, 0.3, size=12, bold=True, color=ORANGE)
-txt(s5, "Combines gene knockdown with drug treatment. HTSplotter supports this experiment "
-        "type, but the example datasets encountered a known array-dimension mismatch in the "
-        "installed version. All other three experiment types ran successfully.",
-    0.6, 5.78, 5.5, 1.0, size=10, color=TEXT_DARK)
+# Genetic-chemical note at bottom
+box(s5, 0.3, 7.08, 12.73, 0.0)   # spacer
+box(s5, 0.3, 7.08, 7.0, 0.0)
 
-# ── RIGHT: AI chat ───────────────────────────────────────────────────────────
-box(s5, 6.75, 1.0, 6.25, 6.05,
+footer(s5, 5)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SLIDE 6 — AI-Assisted Chat Interface
+# ══════════════════════════════════════════════════════════════════════════════
+s6 = prs.slides.add_slide(blank)
+bg(s6, WHITE)
+header(s6, "AI-Assisted Results Interpretation",
+       "Interactive Claude-powered chat interface built on top of HTSplotter")
+
+# Intro banner
+box(s6, 0.3, 1.0, 12.73, 0.72,
+    fill=RGBColor(0xEF, 0xF4, 0xFB), line=MID_BLUE, lw=1)
+txt(s6,
+    "After running any HTSplotter analysis, researchers can ask plain-English questions about "
+    "their results using an AI chat interface powered by the Anthropic Claude API (claude-opus-4-7). "
+    "No bioinformatics expertise required — just type your question.",
+    0.5, 1.07, 12.3, 0.58, size=12, color=DARK_BLUE)
+
+# ── LEFT: how it works ───────────────────────────────────────────────────────
+box(s6, 0.3, 1.82, 5.9, 5.23,
+    fill=RGBColor(0xF5, 0xF9, 0xFF), line=MID_BLUE, lw=1)
+txt(s6, "How It Works", 0.5, 1.9, 5.5, 0.38,
+    size=15, bold=True, color=DARK_BLUE)
+
+for i, (step, detail) in enumerate([
+    ("Run HTSplotter",
+     "Execute any analysis (drug screen, combination, genetic). Results are saved as .txt files in the output_results/ folder."),
+    ("Set your API key",
+     "Get a free API key from console.anthropic.com. Set it once: export ANTHROPIC_API_KEY='sk-ant-...'"),
+    ("Launch the chat",
+     "Run:  python chat_results.py  [results_dir]\nThe script loads all result files automatically and caches them for efficiency."),
+    ("Ask questions",
+     "Type any question about your data. The chat maintains conversation history so you can ask follow-ups."),
+    ("Exit anytime",
+     "Type quit, exit, or press Ctrl+C to stop."),
+]):
+    y = 2.38 + i * 0.93
+    box(s6, 0.42, y, 0.52, 0.52, fill=MID_BLUE)
+    txt(s6, str(i+1), 0.44, y+0.08, 0.48, 0.36,
+        size=16, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+    txt(s6, step, 1.05, y+0.02, 4.95, 0.26, size=11, bold=True, color=DARK_BLUE)
+    txt(s6, detail, 1.05, y+0.27, 4.95, 0.6, size=10, color=TEXT_DARK)
+
+# ── RIGHT: example conversation ──────────────────────────────────────────────
+box(s6, 6.5, 1.82, 6.53, 5.23,
     fill=RGBColor(0xF0, 0xF4, 0xF9), line=MID_BLUE, lw=1)
-txt(s5, "🤖  AI-Assisted Results Chat",
-    6.92, 1.07, 5.88, 0.38, size=14, bold=True, color=DARK_BLUE)
-txt(s5,
-    "An interactive chat interface built on top of HTSplotter using the Anthropic Claude API. "
-    "Load any results folder and ask plain-English questions — no bioinformatics expertise required.",
-    6.92, 1.52, 5.88, 0.72, size=11, color=TEXT_DARK)
+txt(s6, "Example Conversation", 6.7, 1.9, 6.1, 0.38,
+    size=15, bold=True, color=DARK_BLUE)
 
-def bubble(slide, speaker, text, top):
+def bubble(slide, speaker, text, top, width=6.1, left=6.6):
     user = speaker == "You"
     fc = MID_BLUE if user else RGBColor(0xE8, 0xF1, 0xFB)
     tc = WHITE    if user else TEXT_DARK
-    box(slide, 7.0, top, 5.75, 0.5,
+    # estimate height based on text length
+    lines = text.count("\n") + max(1, len(text) // 62)
+    h = 0.3 + lines * 0.2
+    box(slide, left, top, width, h,
         fill=fc, line=RGBColor(0xBB, 0xCC, 0xDD), lw=0.5)
-    txt(slide, f"{speaker}:  {text}", 7.1, top+0.06, 5.6, 0.4, size=10, color=tc)
+    txt(slide, f"{speaker}:  {text}", left+0.12, top+0.06, width-0.18, h-0.1,
+        size=10, color=tc)
+    return top + h + 0.1
 
-bubble(s5, "You",    "Which drug was most potent?",                          2.35)
-bubble(s5, "Claude", "Prexasertib — IC₅₀ ≈ 10 nM, ~66× more potent than MK-1775.", 2.93)
-bubble(s5, "You",    "Is there synergy between MK-1775 and Prexasertib?",    3.51)
-bubble(s5, "Claude", "Yes — Bliss scores up to +0.56. Strongest at mid-range\nMK-1775 with low Prexasertib doses.", 4.09)
-bubble(s5, "You",    "What does a growth rate > 1 mean in the genetic screen?", 4.75)
-bubble(s5, "Claude", "The knockdown is growing faster than control — it may\nhave silenced a tumour suppressor or growth brake.", 5.33)
+y = 2.4
+y = bubble(s6, "You",    "Which drug was most potent?", y)
+y = bubble(s6, "Claude", "Prexasertib — IC₅₀ ≈ 10 nM. That's ~27× more potent than BAY1895344 and ~66× more potent than MK-1775 in MCF7 cells.", y)
+y = bubble(s6, "You",    "Is there synergy between MK-1775 and Prexasertib?", y)
+y = bubble(s6, "Claude", "Yes — Bliss scores reach +0.56, indicating clear synergy. The strongest effect occurs at mid-range MK-1775 (137–1,235 nM) combined with low Prexasertib doses (1.4–7.1 nM).", y)
+y = bubble(s6, "You",    "What does a growth rate > 1 mean in the genetic screen?", y)
+y = bubble(s6, "Claude", "A growth rate > 1 means those cells grew faster than the control. This could indicate the knockdown silenced a growth-suppressing gene, effectively releasing a brake on proliferation.", y)
 
-# How-to footer bar
-box(s5, 6.85, 6.18, 6.1, 0.62, fill=DARK_BLUE)
-txt(s5, "How to use", 7.0, 6.22, 2.0, 0.25,
-    size=10, bold=True, color=LIGHT_BLUE)
-txt(s5, "export ANTHROPIC_API_KEY='sk-ant-...'", 7.0, 6.46, 5.8, 0.22,
-    size=9, color=LIGHT_BLUE, bold=True)
-txt(s5, "python chat_results.py  [path/to/output_results/]",
-    7.0, 6.65, 5.8, 0.22, size=9, color=LIGHT_BLUE, bold=True)
-txt(s5, "github.com/aaronwils246/HTSplotter-chat",
-    9.8, 6.22, 2.9, 0.25, size=9, color=RGBColor(0x88,0xBB,0xE0), align=PP_ALIGN.RIGHT)
+# Technical features strip
+box(s6, 0.3, 7.08, 12.73, 0.0)
+box(s6, 0.3, 6.88, 12.73, 0.22, fill=DARK_BLUE)
+feats = [
+    "Model: claude-opus-4-7",
+    "Streaming responses",
+    "Prompt caching (cost-efficient)",
+    "Full conversation history",
+    "Works with any HTSplotter output folder",
+    "github.com/aaronwils246/HTSplotter-chat",
+]
+txt(s6, "  ·  ".join(feats), 0.4, 6.9, 12.5, 0.18,
+    size=9, bold=True, color=LIGHT_BLUE)
 
-footer(s5, 5)
+footer(s6, 6)
 
 
 # ── Save ───────────────────────────────────────────────────────────────────
